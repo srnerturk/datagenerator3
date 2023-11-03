@@ -1,11 +1,24 @@
 <!-- eslint-disable max-len -->
 <template>
   <div class="main">
-    <ContentComponent :generatedData="generatedData" :rows="rows" :dataTypes="dataTypes" :testData="testData"
-      @onDataTypeChanged="onDataTypeChanged" @onPropertyNameChanged="onPropertyNameChanged" @addNewRow="addNewRow"
-      @changePopupVisibility="changePopupVisibility" @deleteRow="deleteRow" />
-    <PopupComponent @closePopup="closePopup" @downloadJson="downloadJson" v-if="popupVisible"
-      :maksimumDataExport="maksimumDataExport" :dataCount="dataCount" />
+    <ContentComponent
+      :generatedData="generatedData"
+      :rows="rows"
+      :dataTypes="dataTypes"
+      :testData="testData"
+      @onDataTypeChanged="onDataTypeChanged"
+      @onPropertyNameChanged="onPropertyNameChanged"
+      @addNewRow="addNewRow"
+      @changePopupVisibility="changePopupVisibility"
+      @deleteRow="deleteRow"
+    />
+    <PopupComponent
+      @closePopup="closePopup"
+      @downloadJson="downloadJson"
+      v-if="popupVisible"
+      :maksimumDataExport="maksimumDataExport"
+      :dataCount="dataCount"
+    />
   </div>
 </template>
 
@@ -164,9 +177,15 @@ export default {
         },
       ],
       dataCount: 3,
-      rows: [{
-        id: 0, dataType: '', propertyName: '', example: '', oldKey: '',
-      }],
+      rows: [
+        {
+          id: 0,
+          dataType: '',
+          propertyName: '',
+          example: '',
+          oldKey: '',
+        },
+      ],
       url: 'http://localhost:8080',
       testData: [],
     };
@@ -194,54 +213,18 @@ export default {
       // console.log(index);
     },
     onPropertyNameChanged(index) {
-      // let arr = [];
-      // eslint-disable-next-line no-alert
-      // const code = {};
-      // eslint-disable-next-line no-plusplus
-      // eslint-disable-next-line no-plusplus
-      let key = '';
-      const { propertyName } = this.rows[index];
-      const { dataType } = this.rows[index];
-      // if (propertyName) {
-      //   key = propertyName;
-      // } else if (dataType) {
-      //   key = dataType;
-      // } else if (oldKey) {
-      //   key = oldKey;
-      // }
-      if (dataType) {
-        key = dataType;
-      }
-      if (propertyName) {
-        key = propertyName;
-      }
-      let keys = [];
-      if (key !== '') {
-        // eslint-disable-next-line no-plusplus
-        for (let j = 0; j < this.dataCount; j++) {
-          const obj = this.generatedData[j];
-          // console.log(obj);
-          keys = Object.keys(obj).filter((x) => x === propertyName || x === dataType);
-          if (keys.length === 0) {
-            keys = [propertyName];
-          }
-          // console.log(keys);
-          // console.log(keys);
-          // eslint-disable-next-line no-const-assign, no-plusplus
-          for (let i = 0; i < keys.length; i++) {
-            keys.forEach((k) => {
-              console.log(k);
-              // console.log('old-data', prop);
-              // console.log('old-obj', obj[key]);
-              // obj[prop] = obj[k];
-              // delete obj[k];
-            });
-          }
-          // this.oldKey = key;
-          // console.log(keys);
-        }
-        // console.log(key);
-      }
+      // eslint-disable-next-line no-unused-vars
+      const currentRow = this.rows[index];
+      const { propertyName } = currentRow;
+      const { oldKey } = currentRow;
+
+      this.generatedData.forEach((element) => {
+        // eslint-disable-next-line no-param-reassign
+        element[propertyName] = currentRow.example;
+        // eslint-disable-next-line no-param-reassign
+        delete element[oldKey];
+        currentRow.oldKey = propertyName;
+      });
       this.generatedData = [...this.generatedData];
     },
     async generateCode(row, index) {
@@ -250,12 +233,12 @@ export default {
       for (let i = 0; i < this.rows.length; i++) {
         let randomName = null;
         const key = this.rows[i].propertyName || this.rows[i].dataType;
-        this.rows[i].oldKey = key;
         if (row.id === i && key !== '') {
           // eslint-disable-next-line no-await-in-loop
           await this.generateRandom(key);
           randomName = this.exampleDatas[index];
         }
+        this.rows[i].oldKey = key;
         if (randomName != null) {
           this.rows[i].example = randomName;
         }
@@ -281,7 +264,9 @@ export default {
       spesicifData = spesicifData.charAt(0).toLowerCase() + spesicifData.slice(1);
       // eslint-disable-next-line no-useless-catch
       try {
-        const res = await axios.get(`${this.url}/generateData?${findKey.req}=true&repeat=${this.dataCount}`);
+        const res = await axios.get(
+          `${this.url}/generateData?${findKey.req}=true&repeat=${this.dataCount}`,
+        );
         // eslint-disable-next-line no-unused-vars
         // const response = res.data[0].filter(item => item.ad === spesicifData);
         // eslint-disable-next-line no-unreachable-loop, no-plusplus
@@ -321,7 +306,11 @@ export default {
       this.rows = [
         ...this.rows,
         {
-          id: this.rows.length, dataType: '', propertyName: '', example: '', oldKey: '',
+          id: this.rows.length,
+          dataType: '',
+          propertyName: '',
+          example: '',
+          oldKey: '',
         },
       ];
     },
@@ -371,7 +360,7 @@ export default {
 };
 </script>
 
-<style  scoped lang="scss">
+<style scoped lang="scss">
 .main {
   width: 100%;
   height: 100%;
